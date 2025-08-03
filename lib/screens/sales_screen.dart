@@ -58,8 +58,9 @@ class _SalesScreenState extends State<SalesScreen> {
               StreamBuilder<List<Producto>>(
                 stream: _firestore.obtenerProductos(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData)
+                  if (!snapshot.hasData) {
                     return const CircularProgressIndicator();
+                  }
 
                   final productos = snapshot.data!;
                   return DropdownButtonFormField<Producto>(
