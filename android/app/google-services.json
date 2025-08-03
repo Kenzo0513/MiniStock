@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "341420283993",
+    "project_id": "ministock-app",
+    "storage_bucket": "ministock-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341420283993:android:1ba205a93e718535d7f948",
+        "android_client_info": {
+          "package_name": "com.ministock.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVXYQIwVATZwBs3qoZpVyhXxgaxrw7aUo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
