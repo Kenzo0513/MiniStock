@@ -55,7 +55,7 @@ class FirestoreService {
   // Calcular total de ventas del día
   Future<double> totalVentasDelDia(DateTime fecha) async {
     final ventas = await obtenerVentasDelDia(fecha);
-    return ventas.fold(0.0, (total, v) => total + v.total);
+    return ventas.fold<double>(0.0, (total, v) => total + v.total);
   }
 
   // Generar ID único (para productos o ventas)

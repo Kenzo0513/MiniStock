@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,10 +16,8 @@ class MiniStockApp extends StatelessWidget {
     return MaterialApp(
       title: 'MiniStock',
       theme: ThemeData(primarySwatch: Colors.indigo),
-      home: Scaffold(
-        appBar: AppBar(title: const Text('MiniStock')),
-        body: const Center(child: Text('Bienvenido a MiniStock')),
-      ),
+      debugShowCheckedModeBanner: false,
+      home: const HomeScreen(),
     );
   }
 }

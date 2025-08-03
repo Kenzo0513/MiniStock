@@ -1,10 +1,10 @@
 class Producto {
-  String id;
-  String codigoBarras;
-  String nombre;
-  double precio;
-  int cantidad;
-  DateTime caducidad;
+  final String id;
+  final String codigoBarras;
+  final String nombre;
+  final double precio;
+  final int cantidad;
+  final DateTime caducidad;
 
   Producto({
     required this.id,
@@ -28,7 +28,7 @@ class Producto {
     id: map['id'],
     codigoBarras: map['codigoBarras'],
     nombre: map['nombre'],
-    precio: map['precio'],
+    precio: (map['precio'] as num).toDouble(),
     cantidad: map['cantidad'],
     caducidad: DateTime.parse(map['caducidad']),
   );

@@ -11,38 +11,51 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('MiniStock')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          ElevatedButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AddProductScreen()),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: ListView(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddProductScreen()),
+                );
+              },
+              child: const Text('Registrar Producto'),
             ),
-            child: const Text('Registrar Producto'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const InventoryScreen()),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const InventoryScreen()),
+                );
+              },
+              child: const Text('Ver Inventario'),
             ),
-            child: const Text('Ver Inventario'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SalesScreen()),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SalesScreen()),
+                );
+              },
+              child: const Text('Registrar Venta'),
             ),
-            child: const Text('Registrar Venta'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ReportScreen()),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ReportScreen()),
+                );
+              },
+              child: const Text('Ver Reporte Diario'),
             ),
-            child: const Text('Ver Reporte Diario'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

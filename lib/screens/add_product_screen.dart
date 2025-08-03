@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mini_stock/models/producto.dart';
+import 'package:mini_stock/services/firestore_service.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
@@ -15,29 +17,37 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _precioController = TextEditingController();
   final _cantidadController = TextEditingController();
   DateTime? _caducidad;
+  final _service = FirestoreService();
 
-  Future<void> _selectDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-      initialDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() => _caducidad = picked);
+  void _guardarProducto() async {
+    if (_formKey.currentState!.validate() && _caducidad != null) {
+      final producto = Producto(
+        id: _service.generarId(),
+        codigoBarras: _codigoController.text.trim(),
+        nombre: _nombreController.text.trim(),
+        precio: double.parse(_precioController.text),
+        cantidad: int.parse(_cantidadController.text),
+        caducidad: _caducidad!,
+      );
+
+      await _service.agregarProducto(producto);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Producto guardado exitosamente")),
+      );
+      Navigator.pop(context);
     }
   }
 
-  void _guardarProducto() {
-    if (_formKey.currentState!.validate() && _caducidad != null) {
-      // TODO: Conectar con FirestoreService para guardar el producto
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Producto registrado exitosamente")),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Completa todos los campos")),
-      );
+  Future<void> _seleccionarFecha() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() => _caducidad = picked);
     }
   }
 
@@ -63,36 +73,36 @@ class _AddProductScreenState extends State<AddProductScreen> {
               TextFormField(
                 controller: _codigoController,
                 decoration: const InputDecoration(
-                  labelText: 'Código de Barras',
+                  labelText: 'Código de barras',
                 ),
-                validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
+                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
               ),
               TextFormField(
                 controller: _nombreController,
                 decoration: const InputDecoration(
                   labelText: 'Nombre del producto',
                 ),
-                validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
+                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
               ),
               TextFormField(
                 controller: _precioController,
-                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'Precio'),
-                validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
+                keyboardType: TextInputType.number,
+                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
               ),
               TextFormField(
                 controller: _cantidadController,
-                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'Cantidad'),
-                validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
+                keyboardType: TextInputType.number,
+                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
               ),
               const SizedBox(height: 12),
               ElevatedButton(
-                onPressed: _selectDate,
+                onPressed: _seleccionarFecha,
                 child: Text(
                   _caducidad == null
                       ? 'Seleccionar Fecha de Caducidad'
-                      : 'Caduca: ${DateFormat.yMd().format(_caducidad!)}',
+                      : 'Caducidad: ${DateFormat.yMd().format(_caducidad!)}',
                 ),
               ),
               const SizedBox(height: 16),
