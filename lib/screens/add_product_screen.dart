@@ -19,23 +19,51 @@ class _AddProductScreenState extends State<AddProductScreen> {
   DateTime? _caducidad;
   final _service = FirestoreService();
 
+  bool _guardando = false; // ⏳ Estado para animación de carga
+
   void _guardarProducto() async {
     if (_formKey.currentState!.validate() && _caducidad != null) {
+      setState(() => _guardando = true); // Mostrar spinner
+
       final producto = Producto(
         id: _service.generarId(),
         codigoBarras: _codigoController.text.trim(),
         nombre: _nombreController.text.trim(),
-        precio: double.parse(_precioController.text),
-        cantidad: int.parse(_cantidadController.text),
+        precio: double.tryParse(_precioController.text) ?? 0,
+        cantidad: int.tryParse(_cantidadController.text) ?? 0,
         caducidad: _caducidad!,
       );
 
-      await _service.agregarProducto(producto);
-      if (!mounted) return;
+      try {
+        await _service.agregarProducto(producto);
+
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Producto registrado correctamente'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        Navigator.pop(context);
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Error al registrar producto: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } finally {
+        if (mounted) setState(() => _guardando = false); // Ocultar spinner
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Producto guardado exitosamente")),
+        const SnackBar(
+          content: Text('⚠️ Completa todos los campos y selecciona caducidad'),
+          backgroundColor: Colors.orange,
+        ),
       );
-      Navigator.pop(context);
     }
   }
 
@@ -106,11 +134,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: _guardarProducto,
-                icon: const Icon(Icons.save),
-                label: const Text('Guardar Producto'),
-              ),
+              _guardando
+                  ? const Center(child: CircularProgressIndicator())
+                  : ElevatedButton.icon(
+                      onPressed: _guardarProducto,
+                      icon: const Icon(Icons.save),
+                      label: const Text('Guardar Producto'),
+                    ),
             ],
           ),
         ),
