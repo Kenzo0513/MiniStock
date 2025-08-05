@@ -32,4 +32,12 @@ class Producto {
     cantidad: map['cantidad'],
     caducidad: DateTime.parse(map['caducidad']),
   );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Producto && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
