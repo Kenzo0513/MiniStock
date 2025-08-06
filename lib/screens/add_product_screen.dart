@@ -29,7 +29,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
         id: _service.generarId(),
         codigoBarras: _codigoController.text.trim(),
         nombre: _nombreController.text.trim(),
-        precio: double.tryParse(_precioController.text) ?? 0,
+        precio:
+            double.tryParse(_precioController.text.replaceAll(',', '.')) ?? 0,
         cantidad: int.tryParse(_cantidadController.text) ?? 0,
         caducidad: _caducidad!,
       );
