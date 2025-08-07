@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mini_stock/models/producto.dart';
 import 'package:mini_stock/services/firestore_service.dart';
+import 'barcode_scanner_screen.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
@@ -18,12 +19,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _cantidadController = TextEditingController();
   DateTime? _caducidad;
   final _service = FirestoreService();
-
-  bool _guardando = false; // ⏳ Estado para animación de carga
+  bool _guardando = false;
 
   void _guardarProducto() async {
     if (_formKey.currentState!.validate() && _caducidad != null) {
-      setState(() => _guardando = true); // Mostrar spinner
+      setState(() => _guardando = true);
 
       final producto = Producto(
         id: _service.generarId(),
@@ -45,7 +45,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
             backgroundColor: Colors.green,
           ),
         );
-
         Navigator.pop(context);
       } catch (e) {
         if (!mounted) return;
@@ -56,7 +55,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           ),
         );
       } finally {
-        if (mounted) setState(() => _guardando = false); // Ocultar spinner
+        if (mounted) setState(() => _guardando = false);
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -101,8 +100,23 @@ class _AddProductScreenState extends State<AddProductScreen> {
             children: [
               TextFormField(
                 controller: _codigoController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Código de barras',
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.qr_code_scanner),
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BarcodeScannerScreen(
+                            onDetect: (codigo) {
+                              _codigoController.text = codigo;
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
                 validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
               ),
