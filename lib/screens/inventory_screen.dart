@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mini_stock/models/producto.dart';
 import 'package:mini_stock/services/firestore_service.dart';
-import 'package:intl/intl.dart';
+import 'edit_product_screen.dart'; // Importamos la pantalla de edición
 
 class InventoryScreen extends StatelessWidget {
   const InventoryScreen({super.key});
@@ -44,6 +45,15 @@ class InventoryScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  trailing: const Icon(Icons.edit), // 🖉 ícono visual
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EditProductScreen(producto: p),
+                      ),
+                    );
+                  },
                 ),
               );
             },

@@ -12,6 +12,14 @@ class FirestoreService {
     await _db.collection('productos').doc(p.id).set(p.toMap());
   }
 
+  Future<void> actualizarProducto(Producto producto) async {
+    await _db.collection('productos').doc(producto.id).update(producto.toMap());
+  }
+
+  Future<void> eliminarProducto(String id) async {
+    await _db.collection('productos').doc(id).delete();
+  }
+
   // Obtener productos en tiempo real
   Stream<List<Producto>> obtenerProductos() {
     return _db
