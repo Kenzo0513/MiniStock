@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'add_product_screen.dart';
 import 'inventory_screen.dart';
 import 'sales_screen.dart';
-import 'report_screen.dart';
+import 'daily_report_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -49,7 +49,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ReportScreen()),
+                  MaterialPageRoute(builder: (_) => const DailyReportScreen()),
                 );
               },
               child: const Text('Ver Reporte Diario'),

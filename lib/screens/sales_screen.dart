@@ -69,70 +69,65 @@ class _SalesScreenState extends State<SalesScreen> {
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                StreamBuilder<List<Producto>>(
-                  stream: _firestore.obtenerProductos(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const CircularProgressIndicator();
-                    }
+          child: Column(
+            children: [
+              StreamBuilder<List<Producto>>(
+                stream: _firestore.obtenerProductos(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text('Error al cargar productos');
+                  }
+                  if (!snapshot.hasData) {
+                    return const CircularProgressIndicator();
+                  }
 
-                    final productos = snapshot.data!;
+                  final productos = snapshot.data!;
 
-                    // Asegurarse que el producto seleccionado aún esté disponible
-                    final productoValido =
-                        productos.any((p) => p.id == _productoSeleccionado?.id)
-                        ? _productoSeleccionado
-                        : null;
-
-                    return DropdownButtonFormField<Producto>(
-                      hint: const Text('Seleccionar producto'),
-                      value: productoValido,
-                      items: productos.map((producto) {
-                        return DropdownMenuItem(
-                          value: producto,
-                          child: Text(
-                            '${producto.nombre} (Disp: ${producto.cantidad})',
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (nuevo) =>
-                          setState(() => _productoSeleccionado = nuevo),
-                      validator: (value) =>
-                          value == null ? 'Selecciona un producto' : null,
-                    );
-                  },
+                  return DropdownButtonFormField<Producto>(
+                    hint: const Text('Seleccionar producto'),
+                    value: _productoSeleccionado,
+                    items: productos.map((producto) {
+                      return DropdownMenuItem(
+                        value: producto,
+                        child: Text(
+                          '${producto.nombre} (Disp: ${producto.cantidad})',
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (nuevo) =>
+                        setState(() => _productoSeleccionado = nuevo),
+                    validator: (value) =>
+                        value == null ? 'Selecciona un producto' : null,
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Cantidad vendida',
                 ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Cantidad vendida',
-                  ),
-                  keyboardType: TextInputType.number,
-                  initialValue: '1',
-                  validator: (value) =>
-                      (value == null ||
-                          int.tryParse(value) == null ||
-                          int.parse(value) <= 0)
-                      ? 'Cantidad inválida'
-                      : null,
-                  onChanged: (value) =>
-                      _cantidadVendida = int.tryParse(value) ?? 1,
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _registrarVenta();
-                    }
-                  },
-                  icon: const Icon(Icons.sell),
-                  label: const Text('Registrar Venta'),
-                ),
-              ],
-            ),
+                keyboardType: TextInputType.number,
+                initialValue: '1',
+                validator: (value) =>
+                    (value == null ||
+                        int.tryParse(value) == null ||
+                        int.parse(value) <= 0)
+                    ? 'Cantidad inválida'
+                    : null,
+                onChanged: (value) =>
+                    _cantidadVendida = int.tryParse(value) ?? 1,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _registrarVenta();
+                  }
+                },
+                icon: const Icon(Icons.sell),
+                label: const Text('Registrar Venta'),
+              ),
+            ],
           ),
         ),
       ),
