@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.ministock.app"
-    compileSdk = 34
+    compileSdk = 35
     ndkVersion = "29.0.13846066"
 
     compileOptions {

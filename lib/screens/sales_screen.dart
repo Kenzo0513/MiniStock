@@ -58,11 +58,15 @@ class _SalesScreenState extends State<SalesScreen> {
               StreamBuilder<List<Producto>>(
                 stream: _firestore.obtenerProductos(),
                 builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text('Error al cargar productos');
+                  }
                   if (!snapshot.hasData) {
                     return const CircularProgressIndicator();
                   }
 
                   final productos = snapshot.data!;
+
                   return DropdownButtonFormField<Producto>(
                     hint: const Text('Seleccionar producto'),
                     value: _productoSeleccionado,
@@ -100,7 +104,9 @@ class _SalesScreenState extends State<SalesScreen> {
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) _registrarVenta();
+                  if (_formKey.currentState!.validate()) {
+                    _registrarVenta();
+                  }
                 },
                 icon: const Icon(Icons.sell),
                 label: const Text('Registrar Venta'),
