@@ -40,13 +40,6 @@ class InventoryScreen extends StatelessWidget {
         title: const Text('📦 Inventario'),
         backgroundColor: Colors.blue,
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.green,
-        child: const Icon(Icons.add),
-        onPressed: () {
-          // Navegar a pantalla de agregar producto
-        },
-      ),
       body: StreamBuilder(
         stream: firestoreService.obtenerProductosConMetadata(),
         builder: (
@@ -163,15 +156,7 @@ class InventoryScreen extends StatelessWidget {
                                         Text(p.codigoBarras),
                                       ],
                                     ),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.attach_money,
-                                            size: 16, color: Colors.green),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                            p.precio.toStringAsFixed(2)),
-                                      ],
-                                    ),
+                                   
                                     Row(
                                       children: [
                                         const Icon(Icons.shopping_cart,
