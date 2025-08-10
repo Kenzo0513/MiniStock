@@ -1,10 +1,71 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mini_stock/models/venta.dart';
 import 'package:mini_stock/services/firestore_service.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
 
 class DailyReportScreen extends StatelessWidget {
   const DailyReportScreen({super.key});
+
+  Future<void> _exportarPDF(
+    BuildContext context,
+    List<Venta> ventas,
+    double total,
+  ) async {
+    try {
+      final pdf = pw.Document();
+      final fecha = DateFormat('dd-MM-yyyy').format(DateTime.now());
+
+      pdf.addPage(
+        pw.Page(
+          build: (pw.Context ctx) => pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'Reporte Diario - $fecha',
+                style: pw.TextStyle(
+                  fontSize: 20,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 10),
+              pw.Text('Total vendido: \$${total.toStringAsFixed(2)}'),
+              pw.SizedBox(height: 20),
+              pw.Text('Detalle de ventas:'),
+              pw.SizedBox(height: 10),
+              ...ventas.map(
+                (v) => pw.Text(
+                  '${v.nombreProducto} - Cantidad: ${v.cantidadVendida} | Total: \$${v.total.toStringAsFixed(2)}',
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final dir = await getApplicationDocumentsDirectory();
+      final path = '${dir.path}/reporte_diario_$fecha.pdf';
+      final file = File(path);
+
+      await file.writeAsBytes(await pdf.save());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✅ PDF exportado en: $path'),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Error al exportar PDF: $e'),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +126,12 @@ class DailyReportScreen extends StatelessWidget {
                       );
                     },
                   ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () => _exportarPDF(context, ventas, total),
+                  icon: const Icon(Icons.picture_as_pdf),
+                  label: const Text('Exportar a PDF'),
                 ),
               ],
             ),
