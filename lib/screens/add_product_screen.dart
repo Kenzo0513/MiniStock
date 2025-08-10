@@ -79,6 +79,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
   }
 
+  InputDecoration _inputStyle(String label, {Widget? suffixIcon}) {
+    return InputDecoration(
+      labelText: label,
+      filled: true,
+      fillColor: Colors.white,
+      suffixIcon: suffixIcon,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+  }
+
   @override
   void dispose() {
     _codigoController.dispose();
@@ -91,72 +105,106 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Registrar Producto')),
+      backgroundColor: const Color(0xFFF3F6FB),
+      appBar: AppBar(
+        title: const Text('Registrar Producto'),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.blue,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _codigoController,
-                decoration: InputDecoration(
-                  labelText: 'Código de barras',
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.qr_code_scanner),
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => BarcodeScannerScreen(
-                            onDetect: (codigo) {
-                              _codigoController.text = codigo;
-                            },
+        child: Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 4,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
+                  TextFormField(
+                    controller: _codigoController,
+                    decoration: _inputStyle(
+                      'Código de barras',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.qr_code_scanner, color: Colors.blue),
+                        onPressed: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => BarcodeScannerScreen(
+                                onDetect: (codigo) {
+                                  _codigoController.text = codigo;
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _nombreController,
+                    decoration: _inputStyle('Nombre del producto'),
+                    validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _precioController,
+                    decoration: _inputStyle('Precio'),
+                    keyboardType: TextInputType.number,
+                    validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _cantidadController,
+                    decoration: _inputStyle('Cantidad'),
+                    keyboardType: TextInputType.number,
+                    validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: _seleccionarFecha,
+                    icon: const Icon(Icons.date_range),
+                    label: Text(
+                      _caducidad == null
+                          ? 'Seleccionar Fecha de Caducidad'
+                          : 'Caducidad: ${DateFormat.yMd().format(_caducidad!)}',
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _guardando
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onPressed: _guardarProducto,
+                          icon: const Icon(Icons.save),
+                          label: const Text(
+                            'Guardar Producto',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ),
-                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
+                ],
               ),
-              TextFormField(
-                controller: _nombreController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre del producto',
-                ),
-                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
-              ),
-              TextFormField(
-                controller: _precioController,
-                decoration: const InputDecoration(labelText: 'Precio'),
-                keyboardType: TextInputType.number,
-                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
-              ),
-              TextFormField(
-                controller: _cantidadController,
-                decoration: const InputDecoration(labelText: 'Cantidad'),
-                keyboardType: TextInputType.number,
-                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: _seleccionarFecha,
-                child: Text(
-                  _caducidad == null
-                      ? 'Seleccionar Fecha de Caducidad'
-                      : 'Caducidad: ${DateFormat.yMd().format(_caducidad!)}',
-                ),
-              ),
-              const SizedBox(height: 16),
-              _guardando
-                  ? const Center(child: CircularProgressIndicator())
-                  : ElevatedButton.icon(
-                      onPressed: _guardarProducto,
-                      icon: const Icon(Icons.save),
-                      label: const Text('Guardar Producto'),
-                    ),
-            ],
+            ),
           ),
         ),
       ),
