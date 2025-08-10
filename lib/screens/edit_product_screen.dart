@@ -24,16 +24,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   void initState() {
     super.initState();
-    _codigoController = TextEditingController(
-      text: widget.producto.codigoBarras,
-    );
+    _codigoController = TextEditingController(text: widget.producto.codigoBarras);
     _nombreController = TextEditingController(text: widget.producto.nombre);
-    _precioController = TextEditingController(
-      text: widget.producto.precio.toString(),
-    );
-    _cantidadController = TextEditingController(
-      text: widget.producto.cantidad.toString(),
-    );
+    _precioController = TextEditingController(text: widget.producto.precio.toString());
+    _cantidadController = TextEditingController(text: widget.producto.cantidad.toString());
     _caducidad = widget.producto.caducidad;
   }
 
@@ -88,13 +82,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context); // Cierra el diálogo
+              Navigator.pop(context);
               await _service.eliminarProducto(widget.producto.id);
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('🗑️ Producto eliminado')),
               );
-              Navigator.pop(context); // Cierra la pantalla de edición
+              Navigator.pop(context);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Eliminar'),
@@ -110,10 +104,52 @@ class _EditProductScreenState extends State<EditProductScreen> {
       initialDate: _caducidad ?? DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.blue.shade700, // header background color
+              onPrimary: Colors.white, // header text color
+              onSurface: Colors.blue.shade900, // body text color
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.blue.shade700, // button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() => _caducidad = picked);
     }
+  }
+
+  InputDecoration _inputDecoration(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon, color: Colors.blue.shade700),
+      filled: true,
+      fillColor: Colors.blue.shade100.withOpacity(0.3),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.blue.shade400),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.blue.shade700, width: 2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.red.shade700),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.red.shade900, width: 2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+    );
   }
 
   @override
@@ -121,62 +157,101 @@ class _EditProductScreenState extends State<EditProductScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Producto'),
+        backgroundColor: Colors.blue.shade700,
         actions: [
           IconButton(
             icon: const Icon(Icons.delete),
             onPressed: _confirmarEliminar,
             tooltip: 'Eliminar producto',
+            color: Colors.red.shade700,
           ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _codigoController,
-                decoration: const InputDecoration(
-                  labelText: 'Código de barras',
+        child: Center(
+          child: Card(
+            color: Colors.blue.shade50,
+            elevation: 10,
+            shadowColor: Colors.blue.shade300,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: Colors.blue.shade300, width: 1.5),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    TextFormField(
+                      controller: _codigoController,
+                      decoration: _inputDecoration('Código de barras', Icons.qr_code),
+                      validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _nombreController,
+                      decoration: _inputDecoration('Nombre del producto', Icons.label),
+                      validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _precioController,
+                      decoration: _inputDecoration('Precio', Icons.attach_money),
+                      keyboardType: TextInputType.number,
+                      validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _cantidadController,
+                      decoration: _inputDecoration('Cantidad', Icons.inventory),
+                      keyboardType: TextInputType.number,
+                      validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade700,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 6,
+                      ),
+                      onPressed: _seleccionarFecha,
+                      icon: const Icon(Icons.calendar_today),
+                      label: Text(
+                        _caducidad == null
+                            ? 'Seleccionar Fecha de Caducidad'
+                            : 'Caducidad: ${DateFormat.yMd().format(_caducidad!)}',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade900,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 8,
+                      ),
+                      onPressed: _guardarCambios,
+                      icon: const Icon(Icons.save),
+                      label: const Text(
+                        'Guardar Cambios',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                    ),
+                  ],
                 ),
-                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
               ),
-              TextFormField(
-                controller: _nombreController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre del producto',
-                ),
-                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
-              ),
-              TextFormField(
-                controller: _precioController,
-                decoration: const InputDecoration(labelText: 'Precio'),
-                keyboardType: TextInputType.number,
-                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
-              ),
-              TextFormField(
-                controller: _cantidadController,
-                decoration: const InputDecoration(labelText: 'Cantidad'),
-                keyboardType: TextInputType.number,
-                validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: _seleccionarFecha,
-                child: Text(
-                  _caducidad == null
-                      ? 'Seleccionar Fecha de Caducidad'
-                      : 'Caducidad: ${DateFormat.yMd().format(_caducidad!)}',
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: _guardarCambios,
-                icon: const Icon(Icons.save),
-                label: const Text('Guardar Cambios'),
-              ),
-            ],
+            ),
           ),
         ),
       ),

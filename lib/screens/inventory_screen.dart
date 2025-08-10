@@ -82,104 +82,61 @@ class InventoryScreen extends StatelessWidget {
                     final p = productos[index];
                     final esBajoStock = p.cantidad <= _umbralBajoStock;
 
-                    return GestureDetector(
-                      onTapDown: (_) {}, // Aquí se podría agregar animación al presionar
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => EditProductScreen(producto: p),
-                          ),
+                    return TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0, end: 1),
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                      builder: (context, value, child) {
+                        return Transform.scale(
+                          scale: value,
+                          child: child,
                         );
                       },
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0, end: 1),
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeOut,
-                        builder: (context, value, child) {
-                          return Transform.scale(
-                            scale: value,
-                            child: child,
-                          );
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: esBajoStock
-                                  ? Colors.orange.shade300
-                                  : Colors.blue.shade200,
-                              width: 1.5,
+                      child: Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(12),
+                          leading: CircleAvatar(
+                            backgroundColor: esBajoStock
+                                ? Colors.orange.shade100
+                                : Colors.blue.shade100,
+                            child: Icon(
+                              esBajoStock
+                                  ? Icons.warning
+                                  : Icons.inventory_2,
+                              color: esBajoStock ? Colors.orange : Colors.blue,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
                           ),
-                          child: Row(
+                          title: Text(
+                            p.nombre,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                esBajoStock
-                                    ? Icons.warning
-                                    : Icons.inventory_2,
-                                color: esBajoStock
-                                    ? Colors.orange
-                                    : Colors.blue,
-                                size: 32,
+                              Text('Código: ${p.codigoBarras}'),
+                              Text(
+                                  '💲 ${p.precio.toStringAsFixed(2)} | 🛒 ${p.cantidad} unidades'),
+                              Text(
+                                '📅 Caduca: ${DateFormat.yMd().format(p.caducidad)}',
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      p.nombre,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.qr_code,
-                                            size: 16, color: Colors.grey),
-                                        const SizedBox(width: 4),
-                                        Text(p.codigoBarras),
-                                      ],
-                                    ),
-                                   
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.shopping_cart,
-                                            size: 16, color: Colors.blue),
-                                        const SizedBox(width: 4),
-                                        Text('${p.cantidad} unidades'),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.calendar_today,
-                                            size: 16, color: Colors.red),
-                                        const SizedBox(width: 4),
-                                        Text(DateFormat.yMd()
-                                            .format(p.caducidad)),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Icon(Icons.edit, color: Colors.grey),
                             ],
                           ),
+                          trailing: const Icon(Icons.edit, color: Colors.grey),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    EditProductScreen(producto: p),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     );
